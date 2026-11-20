@@ -1,0 +1,11 @@
+# Vercel va muhit fayllari
+.env
+.vercel
+node_modules/
+database/*.sqlite-wal
+database/*.sqlite-shm
+
+# OS fayllari
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,0 +1,19 @@
+# HRD Omborxona Davomat Tizimi - Apache Konfiguratsiyasi
+Options -Indexes
+ServerSignature Off
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Xavfsizlik: .env va .git fayllarga to'g'ridan-to'g'ri kirishni taqiqlash
+<FilesMatch "^\.(env|git|sqlite)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Standart sahifa
+DirectoryIndex index.php index.html

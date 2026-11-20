@@ -1,0 +1,7 @@
+# Uploads papkasida skriptlar ijrosini taqiqlash (Xavfsizlik)
+<FilesMatch "(?i)\.(php|php3|php4|php5|phtml|pl|py|cgi|asp|aspx|sh)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+Options -Indexes -ExecCGI
