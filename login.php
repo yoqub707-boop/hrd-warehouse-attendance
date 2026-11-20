@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
                 <div>
                     <h2 class="text-base font-bold text-white">Xavfsiz Tizimga Kirish</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Faqat ruxsat berilgan ma'murlar uchun</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Faqat ruxsat berilgan foydalanuvchilar uchun</p>
                 </div>
                 <span class="p-2 rounded-xl bg-slate-800 text-emerald-400 text-xs" title="SSL / TLS Xavfsiz ulanish">
                     <i class="fa-solid fa-shield-halved"></i>
@@ -101,14 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" action="login.php?redirect=<?= urlencode($redirect) ?>" class="space-y-4 text-xs">
                 <input type="hidden" name="csrf_token" value="<?= Helpers::csrfToken() ?>">
 
-                <!-- Foydalanuvchi nomi / Email -->
+                <!-- Foydalanuvchi nomi -->
                 <div>
-                    <label class="block font-semibold text-slate-300 mb-1.5">Foydalanuvchi nomi yoki Email</label>
+                    <label class="block font-semibold text-slate-300 mb-1.5">Foydalanuvchi nomi</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                             <i class="fa-solid fa-user text-xs"></i>
                         </div>
-                        <input type="text" name="username" required autofocus placeholder="admin" value="<?= Helpers::e($_POST['username'] ?? '') ?>"
+                        <input type="text" name="username" required autofocus value="<?= Helpers::e($_POST['username'] ?? '') ?>"
                                class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-white placeholder-slate-500 focus:outline-hidden focus:border-blue-500 text-xs">
                     </div>
                 </div>
@@ -116,14 +116,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Parol -->
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <label class="font-semibold text-slate-300">Maxfiy Parol</label>
-                        <span class="text-[10px] text-slate-500 font-mono">5 ta xato urinishda IP bloklanadi</span>
+                        <label class="font-semibold text-slate-300">Parol</label>
                     </div>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                             <i class="fa-solid fa-lock text-xs"></i>
                         </div>
-                        <input type="password" name="password" id="loginPassword" required placeholder="••••••••••••"
+                        <input type="password" name="password" id="loginPassword" required
                                class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-10 py-2.5 text-white placeholder-slate-500 focus:outline-hidden focus:border-blue-500 text-xs">
                         <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white">
                             <i id="passwordEye" class="fa-solid fa-eye text-xs"></i>
