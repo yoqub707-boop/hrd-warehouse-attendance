@@ -139,26 +139,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             </form>
 
-            <!-- STANDART MA'LUMOT / DEMO ESLATMA -->
-            <div class="mt-5 p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-[11px] text-slate-400">
-                <div class="font-bold text-slate-300 mb-1 flex items-center">
-                    <i class="fa-solid fa-key text-blue-400 mr-1.5"></i> Standart Bosh Admin hisobi:
-                </div>
-                <div class="flex justify-between font-mono text-[10px] text-slate-400">
-                    <span>Login: <b class="text-white">admin</b></span>
-                    <span>Parol: <b class="text-white">Admin123!_#</b></span>
-                </div>
-            </div>
-
-            <!-- TERMINAL GA TEZKOR O'TISH HAVOLASI -->
-            <div class="mt-4 pt-4 border-t border-slate-800 text-center">
-                <a href="terminal.php" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold inline-flex items-center space-x-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Face ID Ishchi Terminali (Kiosk) ga o'tish</span>
-                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </a>
-            </div>
-
         </div>
 
         <!-- IP MONITORING BANNERI -->
