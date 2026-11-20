@@ -47,6 +47,9 @@ class TestRunner
         // 7. Xavfsizlik va Barqarorlik auditi (SQLi, XSS, CSRF, .htaccess)
         $this->testSecurityAudit();
 
+        // 8. Autentifikatsiya, Foydalanuvchilar va Kirish Nazorati (IP & Brute-force)
+        $this->testAuthAndAccessControl();
+
         // Yakuniy hisobot
         $total = $this->passed + $this->failed;
         echo "\n=================================================================\n";
@@ -124,7 +127,7 @@ class TestRunner
         $db = Database::getInstance();
         $this->assert($db->getPdo() !== null, "PDO Ma'lumotlar bazasi ulanishi faol");
 
-        $expectedTables = ['departments', 'schedules', 'employees', 'attendances', 'attendance_logs', 'telegram_logs', 'system_settings'];
+        $expectedTables = ['departments', 'schedules', 'employees', 'attendances', 'attendance_logs', 'telegram_logs', 'system_settings', 'users', 'login_logs', 'ip_rate_limits'];
         foreach ($expectedTables as $tbl) {
             $check = $db->fetch("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [$tbl]);
             $this->assert(!empty($check), "Jadval mavjudligi: {$tbl}");
@@ -275,6 +278,49 @@ class TestRunner
         $rootContent = file_get_contents($rootHtaccess);
         $this->assert(str_contains($rootContent, 'X-Content-Type-Options') && str_contains($rootContent, 'X-Frame-Options'),
             "Xavfsizlik sarlavhalari (nosniff, SAMEORIGIN) sozlangan");
+        echo "\n";
+    }
+
+    private function testAuthAndAccessControl(): void
+    {
+        echo "8. AUTENTIFIKATSIYA, FOYDALANUVCHILAR VA IP MONITORINGI TESTI:\n";
+        require_once __DIR__ . '/../src/Auth.php';
+        $auth = Auth::getInstance();
+        $db = Database::getInstance();
+
+        // 8.1 Standart admin mavjudligi
+        $admin = $db->fetch("SELECT * FROM users WHERE username = 'admin'");
+        $this->assert(!empty($admin), "Bosh admin (admin) mavjud");
+
+        // 8.2 Noto'g'ri parol bilan kirish rad etilishi
+        $badLogin = $auth->login('admin', 'WrongPass123!');
+        $this->assert($badLogin['success'] === false, "Noto'g'ri parol kiritilganda kirish rad etildi");
+
+        // 8.3 Login logs jadvalida xatolik qayd etilganligi
+        $lastLog = $db->fetch("SELECT * FROM login_logs ORDER BY id DESC LIMIT 1");
+        $this->assert($lastLog['status'] === 'failed_password' || $lastLog['status'] === 'ip_locked', "Xato urinish IP va vaqt bilan login_logs ga yozildi (IP: {$lastLog['ip_address']})");
+
+        // 8.4 To'g'ri parol bilan kirish
+        $goodLogin = $auth->login('admin', 'Admin123!_#');
+        $this->assert($goodLogin['success'] === true, "To'g'ri parol bilan kirish muvaffaqiyatli");
+        $this->assert($auth->check() === true, "Auth::check() faol sessiyani tasdiqladi");
+
+        // 8.5 Foydalanuvchi oxirgi kirish IP va vaqti yangilanganligi
+        $updatedAdmin = $db->fetch("SELECT last_login_at, last_login_ip FROM users WHERE username = 'admin'");
+        $this->assert(!empty($updatedAdmin['last_login_at']) && !empty($updatedAdmin['last_login_ip']), 
+            "Foydalanuvchining last_login_at va last_login_ip yangilandi ({$updatedAdmin['last_login_ip']})");
+
+        // 8.6 Bloklangan foydalanuvchi bilan kirishni sinash
+        $db->execute("INSERT INTO users (username, name, email, password_hash, role, status) VALUES ('test_blocked', 'Test Bloklangan', 'b@hrd.uz', ?, 'manager', 'blocked')",
+            [password_hash('Test1234!', PASSWORD_DEFAULT)]
+        );
+        $blockedLogin = $auth->login('test_blocked', 'Test1234!');
+        $this->assert($blockedLogin['success'] === false && str_contains($blockedLogin['message'], 'bloklangan'), 
+            "Bloklangan foydalanuvchi tizimga kiritilmadi va blok xabari berildi");
+
+        // Test foydalanuvchini tozalash
+        $db->execute("DELETE FROM users WHERE username = 'test_blocked'");
+        $auth->logout();
         echo "\n";
     }
 }

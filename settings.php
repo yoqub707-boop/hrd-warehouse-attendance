@@ -6,8 +6,11 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/src/Helpers.php';
+require_once __DIR__ . '/src/Auth.php';
 require_once __DIR__ . '/src/Database.php';
 require_once __DIR__ . '/src/TelegramService.php';
+
+Auth::getInstance()->requireAuth();
 
 $telegramService = new TelegramService();
 $db = Database::getInstance();

@@ -6,7 +6,10 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/src/Helpers.php';
+require_once __DIR__ . '/src/Auth.php';
 require_once __DIR__ . '/src/ReportService.php';
+
+Auth::getInstance()->requireAuth();
 
 $reportService = new ReportService();
 

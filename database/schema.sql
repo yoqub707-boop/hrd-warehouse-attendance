@@ -86,6 +86,38 @@ CREATE TABLE IF NOT EXISTS telegram_logs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'admin',
+    status VARCHAR(20) DEFAULT 'active',
+    last_login_at DATETIME NULL,
+    last_login_ip VARCHAR(45) NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS login_logs (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NULL,
+    username VARCHAR(50) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL,
+    user_agent TEXT NULL,
+    status VARCHAR(30) NOT NULL,
+    details TEXT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ip_rate_limits (
+    ip_address VARCHAR(45) PRIMARY KEY,
+    failed_attempts INT DEFAULT 0,
+    locked_until DATETIME NULL,
+    last_attempt_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS system_settings (
     setting_key VARCHAR(100) PRIMARY KEY,
     setting_value TEXT,

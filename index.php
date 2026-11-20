@@ -6,8 +6,12 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/src/Helpers.php';
+require_once __DIR__ . '/src/Auth.php';
 require_once __DIR__ . '/src/Attendance.php';
 require_once __DIR__ . '/src/Employee.php';
+
+// Ruxsat tekshiruvi (faqat tizimga kirgan foydalanuvchilar kira oladi)
+Auth::getInstance()->requireAuth();
 
 $attendanceModel = new Attendance();
 $employeeModel = new Employee();
