@@ -18,8 +18,15 @@ if ($auth->check()) {
 
 $error = '';
 $success = '';
-$redirect = $_GET['redirect'] ?? 'index.php';
+$rawRedirect = $_GET['redirect'] ?? ($_POST['redirect'] ?? '');
+$redirect = $auth->sanitizeRedirectUrl($rawRedirect);
 $clientIp = $auth->getClientIp();
+
+// Xavfsizlik sarlavhalari (Enterprise Web Xavfsizlik Standarti)
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('X-XSS-Protection: 1; mode=block');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrfToken = $_POST['csrf_token'] ?? '';
@@ -34,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $res = $auth->login($username, $password);
             if ($res['success']) {
-                $target = (!empty($redirect) && !str_contains($redirect, 'login.php')) ? $redirect : 'index.php';
+                $target = $auth->sanitizeRedirectUrl($_POST['redirect'] ?? $redirect) ?: 'index.php';
                 header('Location: ' . $target);
                 exit;
             } else {
@@ -98,8 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <!-- LOGIN FORMASI -->
-            <form method="POST" action="login.php?redirect=<?= urlencode($redirect) ?>" class="space-y-4 text-xs">
+            <form method="POST" action="login.php" class="space-y-4 text-xs">
                 <input type="hidden" name="csrf_token" value="<?= Helpers::csrfToken() ?>">
+                <?php if (!empty($redirect)): ?>
+                    <input type="hidden" name="redirect" value="<?= Helpers::e($redirect) ?>">
+                <?php endif; ?>
 
                 <!-- Foydalanuvchi nomi -->
                 <div>
@@ -159,6 +169,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 input.type = 'password';
                 icon.className = 'fa-solid fa-eye text-xs';
             }
+        }
+
+        // Professional URL tozalash (Brauzer qidiruv qatoridagi ?redirect=... kabi parametrlarni avtomatik tozalaydi)
+        if (window.location.search && window.history.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     </script>
 </body>

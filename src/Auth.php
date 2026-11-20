@@ -180,14 +180,70 @@ class Auth
     }
 
     /**
+     * Ochiq yo'naltirish (Open Redirect) va XSS ga qarshi qat'iy sanitizatsiya
+     * Faqat ichki xavfsiz sahifalarga ruxsat beradi, tashqi yoki zararli havolalarni bloklaydi.
+     */
+    public function sanitizeRedirectUrl(?string $url): string
+    {
+        if (empty($url)) {
+            return '';
+        }
+
+        $url = trim($url);
+
+        // 1. Tashqi URL, protokol va protokol-nisbiy havolalarni (//evil.com, https://, javascript:) rad etish
+        if (preg_match('#^(https?:)?//#i', $url) || preg_match('#^(javascript|data|vbscript):#i', $url)) {
+            return '';
+        }
+
+        // 2. URL qismlarini tahlil qilish
+        $parsed = parse_url($url);
+        if ($parsed === false || !empty($parsed['host'])) {
+            return '';
+        }
+
+        $path = $parsed['path'] ?? '';
+        $query = !empty($parsed['query']) ? '?' . $parsed['query'] : '';
+
+        $cleanPath = ltrim($path, '/');
+
+        // Agar bo'sh, /, /index.php, /login.php, /logout.php bo'lsa, redirect parametri umuman kerak emas
+        if (empty($cleanPath) || $cleanPath === 'index.php' || $cleanPath === 'index' || str_contains($cleanPath, 'login') || str_contains($cleanPath, 'logout')) {
+            return '';
+        }
+
+        // Loyiha ichidagi ruxsat berilgan xavfsiz sahifalar ro'yxati (Whitelist)
+        $allowedPages = [
+            'employees.php', 'finance.php', 'reports.php',
+            'schedules.php', 'tracking.php', 'settings.php',
+            'users.php', 'terminal.php', 'test_runner.php'
+        ];
+
+        $checkPath = str_ends_with($cleanPath, '.php') ? $cleanPath : ($cleanPath . '.php');
+
+        if (in_array($checkPath, $allowedPages, true)) {
+            return $cleanPath . $query;
+        }
+
+        return '';
+    }
+
+    /**
      * Ruxsat tekshiruvi (Middleware Guard)
-     * Agar ruxsatsiz bo'lsa darhol login sahifasiga yo'naltiradi.
+     * Agar ruxsatsiz bo'lsa login sahifasiga yo'naltiradi (Toza URL va Open Redirect himoyasi bilan).
      */
     public function requireAuth(string $redirectBack = ''): void
     {
         if (!$this->check()) {
-            $currentUrl = $redirectBack ?: ($_SERVER['REQUEST_URI'] ?? 'index.php');
-            header('Location: login.php?redirect=' . urlencode($currentUrl));
+            $currentUrl = $redirectBack ?: ($_SERVER['REQUEST_URI'] ?? '');
+            $safeRedirect = $this->sanitizeRedirectUrl($currentUrl);
+
+            // Agar shunchaki bosh sahifa bo'lsa, URL ga ?redirect=%2F qo'shilmaydi (Professional toza URL)
+            if (!empty($safeRedirect)) {
+                header('Location: login.php?redirect=' . urlencode($safeRedirect));
+            } else {
+                header('Location: login.php');
+            }
             exit;
         }
     }
