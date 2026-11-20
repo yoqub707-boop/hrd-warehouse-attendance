@@ -21,5 +21,5 @@ INSERT INTO system_settings (setting_key, setting_value, description) VALUES
 ('telegram_chat_id', '', 'Telegram Kanal yoki Guruh ID'),
 ('telegram_notifications_enabled', '1', 'Telegram orqali rasm va xabar yuborish faol'),
 ('terminal_camera_active', '1', 'Kamera orqali rasmga olish majburiy'),
-('warehouse_title', 'Toshkent Markaziy Logistika Omborxonasi', 'Omborxona rasmiy nomi'),
+('warehouse_title', 'Sherobod Markaziy Logistika Omborxonasi', 'Omborxona rasmiy nomi'),
 ('late_tolerance_minutes', '15', 'Kechikish uchun berilgan ruxsat vaqti (daqiqa)');

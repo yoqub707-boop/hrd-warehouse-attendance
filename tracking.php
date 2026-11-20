@@ -59,7 +59,7 @@ require __DIR__ . '/includes/header.php';
     <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-bold text-slate-900">
-                <i class="fa-solid fa-warehouse mr-2 text-blue-600"></i> Toshkent Markaziy Omborxona Zonasi
+                <i class="fa-solid fa-warehouse mr-2 text-blue-600"></i> Sherobod Markaziy Omborxona Zonasi
             </h3>
             <span class="text-xs text-slate-400 font-mono">12,500 m²</span>
         </div>

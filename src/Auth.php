@@ -403,7 +403,7 @@ class Auth
             $hash = password_hash('Admin123!_#', PASSWORD_DEFAULT);
             $this->db->execute(
                 "INSERT INTO users (username, name, email, password_hash, role, status)
-                 VALUES ('admin', 'Toshkent Markaziy Ombor (Bosh Admin)', 'admin@hrd.uz', ?, 'admin', 'active')",
+                 VALUES ('admin', 'Sherobod Markaziy Ombor (Bosh Admin)', 'admin@hrd.uz', ?, 'admin', 'active')",
                 [$hash]
             );
         }
